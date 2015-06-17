@@ -3328,6 +3328,19 @@ EMSCRIPTEN_KEEPALIVE __EMSCRIPTEN_major__ __EMSCRIPTEN_minor__ __EMSCRIPTEN_tiny
     assert len(with_dash_o) == 0
     assert len(without_dash_o) != 0
 
+  def test_dashdM_dashE(self): # issue #3552
+    p = Popen([PYTHON, EMXX, '-dM', '-E', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    p.stdin.close()
+    res = p.wait()
+    err = p.stderr.read()
+    assert res == 0
+    assert "ERROR" not in err, err
+    p = Popen([PYTHON, EMXX, '-dM', '-E', '-x', 'c', os.devnull], stdout=PIPE, stderr=PIPE)
+    res = p.wait()
+    err = p.stderr.read()
+    assert res == 0, err
+    assert "ERROR" not in err, err
+
   def test_dashM(self):
     out = Popen([PYTHON, EMXX, path_from_root('tests', 'hello_world.cpp'), '-M'], stdout=PIPE).communicate()[0]
     self.assertContained('hello_world.o:', out) # Verify output is just a dependency rule instead of bitcode or js
